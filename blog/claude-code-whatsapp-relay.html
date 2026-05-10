@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How I Connected Claude Code to WhatsApp — Nerd Studio</title>
+  <meta name="description" content="How I built a WhatsApp relay that lets me talk to Claude Code from anywhere. Full setup: Baileys WebSocket, QR pairing, Express bridge, pm2." />
+  <meta property="og:title" content="How I Connected Claude Code to WhatsApp" />
+  <meta property="og:description" content="Share Claude Code designs from anywhere. Message Claude from your phone." />
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="https://nerdstudio.online/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-05-10T00:00:00+07:00" />
+  <meta property="article:author" content="Abah" />
+  <meta property="article:tag" content="Claude Code" />
+  <meta property="article:tag" content="WhatsApp" />
+  <meta property="article:tag" content="Baileys" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How I Connected Claude Code to WhatsApp" />
+  <meta name="twitter:image" content="https://nerdstudio.online/og-image.png" />
+  <link rel="canonical" href="https://nerdstudio.online/blog/claude-code-whatsapp-relay.html" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "How I Connected Claude Code to WhatsApp",
+    "description": "How I built a WhatsApp relay that lets me talk to Claude Code from my phone, using Baileys WebSocket, QR pairing, and an Express bridge.",
+    "author": { "@type": "Person", "name": "Abah" },
+    "datePublished": "2026-05-10",
+    "publisher": { "@type": "Organization", "name": "Nerd Studio", "url": "https://nerdstudio.online" },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://nerdstudio.online/blog/claude-code-whatsapp-relay.html" }
+  }
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#020617;--surface:#0f172a;--border:#1e293b;--accent:#22c55e;--text:#f8fafc;--muted:#94a3b8;--dim:#64748b}
+    body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
+    h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:rgba(2,6,23,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06)}
+    .logo{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+    .logo span{color:var(--accent)}
+    .logo:hover{text-decoration:none}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .container{max-width:680px;margin:0 auto;padding:4rem 1.5rem}
+    h1{font-size:2rem;font-weight:700;line-height:1.25;margin-bottom:0.5rem}
+    .post-meta{color:var(--dim);font-size:0.8rem;margin-bottom:2.5rem}
+    h2{font-size:1.35rem;font-weight:700;margin:2.5rem 0 0.75rem;color:var(--accent)}
+    h3{font-size:1.1rem;font-weight:700;margin:2rem 0 0.5rem}
+    p{margin-bottom:1.2rem;color:var(--muted);font-size:0.95rem}
+    ul,ol{margin:0 0 1.2rem 1.5rem;color:var(--muted);font-size:0.95rem}
+    li{margin-bottom:0.4rem}
+    strong{color:var(--text)}
+    pre{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;overflow-x:auto;font-size:0.8rem;line-height:1.6;margin-bottom:1.2rem}
+    code{font-family:monospace;font-size:0.85em}
+    pre code{color:var(--text)}
+    .highlight{color:var(--accent)}
+    .flow-line{color:var(--dim);font-family:monospace;font-size:0.85rem;display:block;padding-left:1rem;margin-bottom:0.2rem}
+    footer{text-align:center;padding:3rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06);color:var(--dim);font-size:0.78rem}
+    footer a{color:var(--muted)}
+    @media(max-width:768px){.nav{padding:0.85rem 1.25rem}.container{padding:2.5rem 1.25rem}h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="logo">Nerd<span>Studio</span></a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#pricing">Pricing</a>
+    <a href="/blog">Blog</a>
+    <a href="/news/">News</a>
+  </div>
+</nav>
+
+<main class="container">
+  <article>
+    <h1>How I Connected Claude Code to WhatsApp</h1>
+    <p class="post-meta">May 10, 2026 · 8 min read</p>
+
+    <p>I run Claude Code on a VPS. I access it from my phone. Not through a web terminal. Not through an app. Through <strong>WhatsApp messages</strong> — just like texting a friend.</p>
+
+    <p>I send a message. Claude thinks. The reply lands in my WhatsApp. I can share Claude Design links from my phone. I can ask questions while commuting. I can deploy code from anywhere with signal.</p>
+
+    <p>Here's exactly how the relay works.</p>
+
+    <h2>The Architecture</h2>
+    <p>Three components. All on one VPS. All in pm2.</p>
+
+    <pre><code>My Phone (WhatsApp)
+    ↓
+WhatsApp Servers
+    ↓
+Baileys WebSocket ← QR scan once → persistent auth
+    ↓
+wa-relay (Express, port 3232) ← HTTP bridge
+    ↓
+abah-brain (memory + context, port 3131)
+    ↓
+Claude Code (reads messages, calls tools, replies)</code></pre>
+
+    <h2>Component 1: The WhatsApp Socket (Baileys)</h2>
+    <p>WhatsApp doesn't have a public API for sending messages. The official Business API requires Facebook verification, a phone number you don't use for personal chat, and template approval. It's designed for customer support bots — not for talking to your own AI.</p>
+
+    <p><strong>Enter Baileys.</strong> It's an open-source WhatsApp WebSocket library that connects to WhatsApp's multi-device protocol — the same one WhatsApp Web uses. It doesn't require a business account. It works with your existing WhatsApp number.</p>
+
+    <pre><code>// Connect to WhatsApp via Baileys
+const { makeWASocket, useMultiFileAuthState } = require('baileys');
+
+const { state, saveCreds } = await useMultiFileAuthState('auth_dir');
+const sock = makeWASocket({ auth: state, printQRInTerminal: true });
+
+// QR code appears in terminal — scan once
+// Credentials saved to disk — auto-reconnect forever
+
+sock.ev.on('messages.upsert', async (msg) => {
+  // New WhatsApp message received
+  const text = msg.messages[0]?.message?.conversation;
+  // Forward to Claude, get reply, send back
+});</code></pre>
+
+    <p>Scan a QR code once. After that, Baileys reconnects automatically using saved credentials. No re-scanning. No session expiry. It just works — like WhatsApp Web but running headlessly on a server.</p>
+
+    <h2>Component 2: The Relay Bridge</h2>
+    <p>Claude Code runs in a terminal. It can't directly receive WebSocket events. So I built a thin Express server that sits between Baileys and Claude:</p>
+
+    <pre><code>WhatsApp Message → Baileys Socket
+    ↓
+wa-relay receives message event
+    ↓
+POST /message → forwards to Claude's handler
+    ↓
+Claude processes → generates reply
+    ↓
+POST /send → wa-relay sends back via Baileys
+    ↓
+WhatsApp Message delivered to my phone</code></pre>
+
+    <p>The relay is just two HTTP endpoints. <code>POST /message</code> receives incoming WhatsApp texts. <code>POST /send</code> pushes replies back out. This clean separation means Claude doesn't need to know anything about WhatsApp — it just reads text and produces text.</p>
+
+    <h2>Component 3: Claude with Tools</h2>
+    <p>The real power isn't just chat — it's <strong>function calling</strong>. Claude has access to my VPS shell, web search, a persistent memory database, and a calendar. From WhatsApp, I can:</p>
+
+    <ul>
+      <li><strong>"Check if the PPTX converter is running"</strong> → Claude runs <code>pm2 status pptx</code> and replies with the process list</li>
+      <li><strong>"Remind me to check the news pipeline at 8am"</strong> → Claude sets a reminder in abah-brain's KV store</li>
+      <li><strong>"What's the latest AI news?"</strong> → Claude fetches from nerdstudio.online/news and summarizes</li>
+      <li><strong>"Deploy the latest nara-agent commit"</strong> → Claude pulls, restarts pm2, confirms status</li>
+    </ul>
+
+    <p>Each tool is a simple function that Claude calls via Gemini's function calling API. The WhatsApp relay doesn't know about tools — it just passes text. Claude decides which tool to use and formats the response.</p>
+
+    <h2>Multi-Client Architecture</h2>
+    <p>The relay supports multiple users. Each client gets their own agent instance with isolated memory, separate brain database, and independent tool access. The architecture for the client-facing version (called "Wolly") looks like this:</p>
+
+    <pre><code>/opt/nerdy/wibowo/
+├── nara-agent/        # The AI brain (Gemini + function calling)
+│   ├── index.js       # Express server on port 3400
+│   ├── core/llm.js    # Gemini function calling loop
+│   ├── core/brain.js  # Persistent memory client
+│   └── tools/         # Shell, web, reminders, calendar
+├── abah-brain/        # Memory database (port 3131)
+└── wa-relay/          # WhatsApp socket (port 3232)</code></pre>
+
+    <p>One VPS. Multiple agents. Each with their own WhatsApp number, their own memory, their own tools.</p>
+
+    <h2>The Hard Part: Pairing</h2>
+    <p>Getting Baileys to pair with WhatsApp was the hardest part. The library provides two methods: QR code scanning and 8-character pairing codes. Both work. Both are fragile.</p>
+
+    <p><strong>QR codes</strong> expire in ~60 seconds. On a headless VPS, you need to display the QR somehow — I built a web page at <code>/connect</code> that shows the QR and auto-refreshes.</p>
+
+    <p><strong>Pairing codes</strong> are even trickier. The user opens WhatsApp → Settings → Linked Devices → Link with phone number, enters an 8-character code. But the code regenerates on every QR refresh, so by the time you navigate the menus, it's already expired.</p>
+
+    <p>The fix: generate pairing codes on-demand via a button click, not automatically. And use the QR as the primary method — it's the same flow everyone knows from WhatsApp Web.</p>
+
+    <h2>Running It</h2>
+    <pre><code># Start the relay
+pm2 start wa-relay --name wa-relay
+
+# Start the agent
+pm2 start nara-agent --name nara-wolly
+
+# Start memory brain
+pm2 start abah-brain
+
+# Scan QR once, then forget about it
+# WhatsApp is now your terminal</code></pre>
+
+    <h2>Why This Matters</h2>
+    <p>Claude Code is powerful on a laptop with a full keyboard and monitor. But most of my ideas happen away from my desk — in transit, during meetings, late at night.</p>
+
+    <p>WhatsApp is always in my pocket. Now Claude is too.</p>
+
+    <p>No new apps. No web terminal. No SSH client. Just the chat app I already use, with an AI on the other end that can think, search, remember, and execute code on my server.</p>
+
+    <p><strong>This is what a personal AI assistant should feel like.</strong></p>
+
+  </article>
+</main>
+
+<footer>
+  <p>&copy; 2026 Nerd Studio. <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/news/">News</a></p>
+</footer>
+
+</body>
+</html>
