@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How I Built a Claude Design → Google Slides Converter — Nerd Studio</title>
+  <meta name="description" content="From idea to shipped SaaS — the full stack behind turning Claude Designs into Google Slides with Drive delivery, watermark gating, and Lemon Squeezy payments." />
+  <meta property="og:title" content="How I Built a Claude Design → Google Slides Converter" />
+  <meta property="og:description" content="Full stack breakdown: Claude API, Puppeteer, Google OAuth, Drive API, Lemon Squeezy, Express, SSE. All in one weekend." />
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="https://nerdstudio.online/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-05-09T00:00:00+07:00" />
+  <meta property="article:author" content="Abah" />
+  <meta property="article:tag" content="Claude AI" />
+  <meta property="article:tag" content="Google Slides" />
+  <meta property="article:tag" content="SaaS" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How I Built a Claude Design → Google Slides Converter" />
+  <meta name="twitter:description" content="Full stack breakdown: Claude API, Puppeteer, Google OAuth, Drive API, Lemon Squeezy. Built in a weekend." />
+  <meta name="twitter:image" content="https://nerdstudio.online/og-image.png" />
+  <link rel="canonical" href="https://nerdstudio.online/blog/how-i-built-claude-design-to-google-slides.html" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "How I Built a Claude Design → Google Slides Converter in a Weekend",
+    "description": "From idea to shipped SaaS — the full stack behind turning Claude Designs into Google Slides with Drive delivery, watermark gating, and Lemon Squeezy payments.",
+    "author": { "@type": "Person", "name": "Abah" },
+    "datePublished": "2026-05-09",
+    "publisher": { "@type": "Organization", "name": "Nerd Studio", "url": "https://nerdstudio.online" },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://nerdstudio.online/blog/how-i-built-claude-design-to-google-slides.html" }
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#020617;--surface:#0f172a;--border:#1e293b;--accent:#22c55e;--text:#f8fafc;--muted:#94a3b8;--dim:#64748b}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
+    h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .nav{
+      position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;
+      align-items:center;padding:1rem 2rem;background:rgba(2,6,23,0.92);
+      backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .logo{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+    .logo span{color:var(--accent)}
+    .logo:hover{text-decoration:none}
+    .nav-links a{color:var(--muted);font-size:0.85rem;margin-left:1.5rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+
+    .container{max-width:680px;margin:0 auto;padding:4rem 1.5rem}
+    article h1{font-size:2rem;font-weight:700;line-height:1.25;margin-bottom:0.5rem}
+    .post-meta{color:var(--dim);font-size:0.8rem;margin-bottom:2.5rem}
+    article h2{font-size:1.35rem;font-weight:700;margin:2.5rem 0 0.75rem;color:var(--accent)}
+    article h3{font-size:1.1rem;font-weight:700;margin:2rem 0 0.5rem}
+    article p{margin-bottom:1.2rem;color:var(--muted);font-size:0.95rem}
+    article ul,article ol{margin:0 0 1.2rem 1.5rem;color:var(--muted);font-size:0.95rem}
+    article li{margin-bottom:0.4rem}
+    article strong{color:var(--text)}
+    pre{
+      background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      padding:1rem 1.2rem;overflow-x:auto;font-size:0.8rem;line-height:1.6;
+      margin-bottom:1.2rem;color:var(--muted);
+    }
+    code{font-family:'DM Sans',monospace;font-size:0.85em}
+    pre code{color:var(--text)}
+    .cta-box{
+      background:var(--accent-glow, rgba(34,197,94,0.08));border:1px solid rgba(34,197,94,0.15);
+      border-radius:12px;padding:1.5rem;text-align:center;margin:2.5rem 0;
+    }
+    .cta-box p{color:var(--text);margin-bottom:0.5rem}
+    footer{text-align:center;padding:3rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06);color:var(--dim);font-size:0.78rem}
+    footer a{color:var(--muted)}
+    @media(max-width:768px){
+      .nav{padding:0.85rem 1.25rem}
+      .container{padding:2.5rem 1.25rem}
+      article h1{font-size:1.5rem}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="logo">Nerd<span>Studio</span></a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#pricing">Pricing</a>
+    <a href="/blog">Blog</a>
+    <a href="/news/">News</a>
+  </div>
+</nav>
+
+<main class="container">
+  <article>
+    <h1>How I Built a Claude Design → Google Slides Converter in a Weekend</h1>
+    <p class="post-meta">May 9, 2026 · 6 min read</p>
+
+    <p>Claude Code can generate beautiful HTML designs. But getting those designs into Google Slides meant copy-pasting screenshots and manually recreating layouts. There had to be a better way.</p>
+
+    <p><strong>So I built one.</strong> Paste a Claude Design URL. Get a Google Slides file delivered to your Drive — with automatic sharing, watermark gating, and Lemon Squeezy subscriptions. All in a weekend.</p>
+
+    <p>Here's exactly how it works, from download to delivery.</p>
+
+    <h2>The Stack</h2>
+    <p>A single Express server. No React. No database migrations. No microservices. Sometimes the best architecture is the simplest one that works.</p>
+    <ul>
+      <li><strong>Express</strong> — handles conversion requests, SSE progress streaming, webhook endpoints</li>
+      <li><strong>Puppeteer</strong> — headless Chrome renders Claude's HTML design and captures slides as images</li>
+      <li><strong>pptxgenjs</strong> — builds PowerPoint files from rendered slide images</li>
+      <li><strong>Google Drive API</strong> — uploads PPTX, converts to Google Slides, handles sharing and permissions</li>
+      <li><strong>Google OAuth</strong> — users sign in, we upload directly to their Drive. They own the file natively.</li>
+      <li><strong>Lemon Squeezy</strong> — subscription billing, license key generation, webhook processing</li>
+      <li><strong>SQLite</strong> — zero-config database for license keys and conversion tracking</li>
+      <li><strong>nginx + Let's Encrypt</strong> — reverse proxy with auto-renewing HTTPS</li>
+    </ul>
+
+    <h2>Architecture: One Request, One Pipeline</h2>
+    <p>The entire conversion is a single async pipeline. No job queues. No workers. Just one function that does everything in sequence:</p>
+
+    <pre><code>User pastes URL + Gmail
+  ↓
+1. Fetch tar bundle from api.anthropic.com/v1/design/h/...
+  ↓
+2. Extract HTML from tar.gz
+  ↓
+3. Render in Puppeteer with watermark overlay
+  ↓
+4. Screenshot each slide individually (show/hide loop)
+  ↓
+5. Build PPTX from images using pptxgenjs
+  ↓
+6. Upload to user's Google Drive via their OAuth token
+  ↓
+7. Convert to Google Slides format
+  ↓
+8. All done — file is in their Drive, they own it</code></pre>
+
+    <p>Every step emits an SSE event. The frontend listens and shows a real-time progress checklist. No polling. No spinners. Just a smooth stream of updates.</p>
+
+    <h2>The Watermark Gate</h2>
+    <p>This was the trickiest design decision. I needed a free tier that was useful enough to try, but gated enough to convert.</p>
+
+    <p><strong>Solution: pixel-baked watermarks.</strong> Free users get every slide rendered as a flat PNG with "PREVIEW — SUBSCRIBE TO REMOVE" permanently baked into the pixels. Not a deletable DOM overlay. Not a text box. An actual part of the image.</p>
+
+    <pre><code>if (hasLicense) {
+  // Clean path: dom-to-pptx for editable output
+  await page.addScriptTag({ url: domToPptxBundle });
+  const blob = await exportToPptx(sections);
+} else {
+  // Watermarked path: screenshot each slide as PNG
+  for (const section of sections) {
+    section.style.display = ''; // show one at a time
+    const png = await page.screenshot();
+    screenshots.push(png);
+    section.style.display = 'none';
+  }
+  // Build PPTX from flat images
+  for (const img of screenshots) {
+    slide.addImage({ data: img, x: 0, y: 0, w: '100%', h: '100%' });
+  }
+}</code></pre>
+
+    <p>To remove the watermark, you'd need Photoshop — not a right-click. The difference between free and paid is the difference between a screenshot and an editable presentation.</p>
+
+    <h2>Google OAuth: Users Own Their Files</h2>
+    <p>Early versions uploaded everything to my Drive account, then tried to share and transfer ownership. That broke. A lot. Google's API doesn't allow ownership transfer to consumer Gmail accounts — only Workspace domains.</p>
+
+    <p><strong>The fix: upload directly to the user's Drive.</strong> One Google Sign-In button. The user grants Drive file scope. We use their OAuth token for the upload. They're the native owner from the moment the file is created. No sharing gymnastics. No permission errors.</p>
+
+    <pre><code>// User signs in via Google Identity Services
+const tokenClient = google.accounts.oauth2.initTokenClient({
+  client_id: GOOGLE_CLIENT_ID,
+  scope: 'https://www.googleapis.com/auth/drive.file',
+  callback: (response) => {
+    googleToken = response.access_token;
+    // Include token with conversion request
+    fetch('/convert', { body: JSON.stringify({ designURL, googleToken }) });
+  },
+});</code></pre>
+
+    <h2>Lemon Squeezy: Zero Payment UI</h2>
+    <p>I didn't build a payment form. Lemon Squeezy handles checkout, tax compliance, recurring billing, and license key delivery. Our job is just one webhook endpoint:</p>
+
+    <pre><code>app.post('/webhook/ls', (req, res) => {
+  res.json({ ok: true }); // ack immediately
+  if (event !== 'order_created') return;
+  const key = 'pptx-sk-' + crypto.randomBytes(8).toString('hex');
+  db.createLicense({ key, email, tier, maxMonthly, expiresAt });
+  // Lemon Squeezy emails the key to user
+});</code></pre>
+
+    <p>User pays → webhook fires → key stored in SQLite → emailed to user. That's the entire payment infrastructure.</p>
+
+    <h2>Concurrency: One at a Time</h2>
+    <p>Puppeteer is hungry. A single conversion can spike to 500MB RAM. On a modest VPS, two simultaneous conversions means an OOM kill.</p>
+
+    <p>The fix isn't a fancy queue system. It's a counter and an array:</p>
+
+    <pre><code>let activeJobs = 0;
+const MAX_CONCURRENT = 1;
+const jobQueue = [];
+
+if (activeJobs >= MAX_CONCURRENT) {
+  jobQueue.push({ id, designURL, ... });
+} else {
+  activeJobs++;
+  processJob(id, designURL, ...)
+    .finally(() => {
+      activeJobs--;
+      if (jobQueue.length > 0) {
+        const next = jobQueue.shift();
+        activeJobs++;
+        processJob(next.id, next.designURL, ...);
+      }
+    });
+}</code></pre>
+
+    <h2>What I'd Do Differently</h2>
+    <p><strong>Stream the upload.</strong> Currently we build the entire PPTX in memory before uploading. For presentations with 50+ slides and heavy images, this could be a problem. A streaming approach would keep memory flat.</p>
+
+    <p><strong>Add analytics.</strong> I shipped without any usage tracking. Can't optimize conversion rates if you don't know where users drop off. Even a simple counter on each SSE stage would help.</p>
+
+    <p><strong>Pre-render previews.</strong> The thumbnail generation is basic. A proper multi-slide preview carousel would make the free tier more compelling.</p>
+
+    <h2>Ship It</h2>
+    <p>The entire thing — Express server, Puppeteer rendering, Google OAuth, Drive upload, watermark gate, payment webhooks, and landing page — was built and deployed in a weekend.</p>
+
+    <p>You don't need a microservice architecture for a SaaS that does one thing well. You need a pipeline that works, a payment provider that handles the boring stuff, and a watermark that can't be deleted.</p>
+
+    <div class="cta-box">
+      <p><strong>Try it yourself at <a href="https://pptx.nerdstudio.online">pptx.nerdstudio.online</a></strong></p>
+      <p style="font-size:0.85rem;color:var(--dim);">Paste a Claude Design URL. Preview is free.</p>
+      <p style="margin-top:0.75rem;"><strong>Source code: <a href="https://github.com/AbahKili/nerdstudio-pptx">github.com/AbahKili/nerdstudio-pptx</a></strong> — MIT licensed, open source.</p>
+    </div>
+  </article>
+</main>
+
+<footer>
+  <p>&copy; 2026 Nerd Studio. <a href="/">Home</a> · <a href="/blog">Blog</a></p>
+</footer>
+
+</body>
+</html>
