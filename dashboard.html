@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Nerd Studio</title>
+  <meta name="description" content="Your Nerd Studio workspace. Access all your tools from one place." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:var(--ns-bg);--surface:var(--ns-surface);--border:var(--ns-border);--text:var(--ns-text);--text-secondary:var(--ns-text-secondary);--text-tertiary:var(--ns-text-tertiary);--accent:var(--ns-accent);--accent-dim:rgba(34,197,94,0.1);--accent-border:rgba(34,197,94,0.15)}
+    body{font-family:var(--ns-font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .mono{font-family:'JetBrains Mono',monospace}
+
+    /* Nav */
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.5rem;background:rgba(8,11,18,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-home{font-weight:600;font-size:0.95rem;color:var(--text);display:flex;align-items:center;gap:0.4rem}
+    .nav-home:hover{text-decoration:none}
+    .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    .nav-links{display:flex;gap:1rem;align-items:center}
+    .nav-links a{color:var(--text-secondary);font-size:0.83rem;transition:color 0.15s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .nav-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--accent-border)}
+
+    /* Layout */
+    .container{max-width:960px;margin:0 auto;padding:2.5rem 1.5rem}
+
+    /* Welcome */
+    .welcome{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+    .welcome h1{font-size:1.6rem;font-weight:700;letter-spacing:-0.02em}
+    .welcome h1 em{font-style:normal;color:var(--accent)}
+    .welcome p{color:var(--text-secondary);font-size:0.9rem}
+    .btn{display:inline-block;padding:0.55rem 1.25rem;border-radius:7px;font-size:0.85rem;font-weight:500;transition:all 0.15s;border:none;cursor:pointer;font-family:inherit}
+    .btn-primary{background:var(--accent);color:#000}
+    .btn-primary:hover{background:#16a34a;text-decoration:none}
+    .btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--text);border-color:var(--text-tertiary);text-decoration:none}
+
+    /* Products grid */
+    .section-label{font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:0.75rem}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0.85rem;margin-bottom:2.5rem}
+    .product-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;transition:border-color 0.15s;display:block;color:inherit;position:relative}
+    .product-card:hover{text-decoration:none;border-color:var(--accent-border)}
+    .product-card h3{font-size:1rem;font-weight:600;margin-bottom:0.3rem;letter-spacing:-0.01em}
+    .product-card p{color:var(--text-secondary);font-size:0.83rem;line-height:1.5;margin-bottom:0.75rem}
+    .product-card .url{font-size:0.72rem;color:var(--text-tertiary);font-family:'JetBrains Mono',monospace}
+    .product-card .badge{position:absolute;top:12px;right:12px;font-size:0.6rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:4px;background:var(--accent-dim);color:var(--accent)}
+
+    /* Billing */
+    .billing-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+    .billing-card h3{font-size:1rem;font-weight:600;margin-bottom:0.5rem}
+    .billing-card p{color:var(--text-secondary);font-size:0.83rem;margin-bottom:1rem}
+    .billing-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+    .billing-status{font-size:0.85rem;color:var(--text-secondary)}
+    .billing-status strong{color:var(--accent);font-weight:600}
+
+    /* Footer */
+    footer{text-align:center;padding:2rem;border-top:1px solid var(--border);color:var(--text-tertiary);font-size:0.78rem;margin-top:3rem}
+
+    @media(max-width:640px){
+      .nav{padding:0.7rem 1rem}
+      .container{padding:1.5rem 1rem}
+    }
+  </style>
+  <link rel="stylesheet" href="/tokens/nerd.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-home"><span class="nav-dot"></span>Nerd Studio</a>
+  <div class="nav-links">
+    <a href="/blog/">Writing</a>
+    <a href="/about">About</a>
+    <a href="/dashboard">Dashboard</a>
+  </div>
+</nav>
+
+<main class="container">
+  <!-- Welcome -->
+  <div class="welcome">
+    <div>
+      <h1 id="greeting">Welcome <em>back</em>.</h1>
+      <p id="subtitle">Your workspace. All your tools in one place.</p>
+    </div>
+    <div>
+      <a href="https://id.nerdstudio.online/login?redirect=https://nerdstudio.online/dashboard" class="btn btn-primary" id="login-btn">Sign in</a>
+      <button class="btn btn-ghost" id="logout-btn" style="display:none" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Your tools -->
+  <div class="section-label">Your Tools</div>
+  <div class="product-grid">
+    <a href="https://board.nerdstudio.online" class="product-card">
+      <span class="badge">board</span>
+      <h3>Nerd Board</h3>
+      <p>Project management with Kanban, Table &amp; Timeline views. Google Calendar sync, Sheets &amp; Slides export.</p>
+      <span class="url">board.nerdstudio.online →</span>
+    </a>
+
+    <a href="https://pptx.nerdstudio.online" class="product-card">
+      <span class="badge">convert</span>
+      <h3>Claude Design → Google Slides</h3>
+      <p>Turn Claude-generated designs into editable presentations. One URL, one click, delivered to your Drive.</p>
+      <span class="url">pptx.nerdstudio.online →</span>
+    </a>
+
+    <a href="https://skip.my.id" class="product-card">
+      <span class="badge">links</span>
+      <h3>skip.my.id</h3>
+      <p>Custom short links with microsite support, QR codes, and analytics. Your links, your brand.</p>
+      <span class="url">skip.my.id →</span>
+    </a>
+
+    <a href="https://draw.nerdstudio.online" class="product-card">
+      <span class="badge">draw</span>
+      <h3>Nerd Draw</h3>
+      <p>Mind mapping and sketching tool. Draw shapes, arrows, freehand, and export to PNG or Google Drive.</p>
+      <span class="url">draw.nerdstudio.online →</span>
+    </a>
+  </div>
+
+  <!-- Billing -->
+  <div class="section-label">Billing</div>
+  <div class="billing-card">
+    <h3>Free Plan</h3>
+    <p>You're currently on the free tier. Upgrade to Pro for unlimited boards, Google export, and AI reminders.</p>
+    <div class="billing-row">
+      <div class="billing-status">
+        <strong>Gratis</strong> — 3 boards, 10 canvases, 20 shortlinks
+      </div>
+      <a href="/upgrade" class="btn btn-primary">Upgrade to Pro — Rp 99K/mo</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2026 Nerd Studio — Jakarta, Indonesia &middot; <a href="/">Home</a> &middot; <a href="/blog/">Writing</a> &middot; <a href="/privacy">Privacy</a></p>
+</footer>
+
+<script>
+// Check IdP session
+(async () => {
+  try {
+    const res = await fetch('https://id.nerdstudio.online/api/me', { credentials: 'include' });
+    if (res.ok) {
+      const user = await res.json();
+      document.getElementById('greeting').innerHTML = 'Welcome <em>back</em>, ' + (user.name || user.email) + '.';
+      document.getElementById('subtitle').textContent = 'Your workspace. All your tools in one place.';
+      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById('logout-btn').style.display = '';
+    }
+  } catch {}
+})();
+
+function logout() {
+  fetch('https://id.nerdstudio.online/api/auth/logout', { method: 'POST', credentials: 'include' })
+    .then(() => { window.location.reload(); });
+}
+</script>
+
+</body>
+</html>

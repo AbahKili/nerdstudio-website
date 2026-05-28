@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Billing — Nerd Studio</title>
+  <meta name="description" content="Manage your Nerd Studio subscription. Upgrade to Pro for unlimited access." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:var(--ns-bg);--surface:var(--ns-surface);--border:var(--ns-border);--text:var(--ns-text);--text-secondary:var(--ns-text-secondary);--text-tertiary:var(--ns-text-tertiary);--accent:var(--ns-accent);--accent-dim:rgba(34,197,94,0.1);--accent-border:rgba(34,197,94,0.15);--red:#f85149;--yellow:#eab308}
+    body{font-family:var(--ns-font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .mono{font-family:'JetBrains Mono',monospace}
+
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.5rem;background:rgba(8,11,18,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-home{font-weight:600;font-size:0.95rem;color:var(--text);display:flex;align-items:center;gap:0.4rem}
+    .nav-home:hover{text-decoration:none}
+    .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    .nav-links{display:flex;gap:1rem;align-items:center}
+    .nav-links a{color:var(--text-secondary);font-size:0.83rem}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+
+    .container{max-width:800px;margin:0 auto;padding:2.5rem 1.5rem}
+    h1{font-size:1.6rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.5rem}
+    h2{font-size:1.2rem;font-weight:600;margin:2rem 0 1rem;letter-spacing:-0.01em}
+    h3{font-size:1rem;font-weight:600}
+    .sub{color:var(--text-secondary);font-size:0.9rem;margin-bottom:2rem}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem}
+    .card h3{margin-bottom:0.5rem}
+    .card p{color:var(--text-secondary);font-size:0.83rem;margin-bottom:0.5rem}
+
+    .btn{display:inline-block;padding:0.55rem 1.25rem;border-radius:7px;font-size:0.85rem;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all 0.15s}
+    .btn-primary{background:var(--accent);color:#000}
+    .btn-primary:hover{background:#16a34a;text-decoration:none}
+    .btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--text);border-color:var(--text-tertiary)}
+    .btn-danger{background:transparent;color:var(--red);border:1px solid rgba(248,81,73,0.2)}
+    .btn-danger:hover{background:rgba(248,81,73,0.08)}
+
+    .plan-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.85rem;margin-bottom:2rem}
+    .plan-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;position:relative}
+    .plan-card.featured{border-color:var(--accent-border);background:var(--accent-dim)}
+    .plan-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;font-size:0.6rem;font-weight:700;padding:0.15rem 0.6rem;border-radius:999px;white-space:nowrap}
+    .plan-name{font-weight:700;font-size:0.95rem;margin-bottom:0.3rem}
+    .plan-price{font-size:1.8rem;font-weight:800;color:var(--accent)}
+    .plan-price span{font-size:0.75rem;color:var(--text-tertiary);font-weight:400}
+    .plan-desc{color:var(--text-secondary);font-size:0.78rem;margin:0.5rem 0}
+    .plan-features{font-size:0.78rem;color:var(--text);line-height:2}
+    .plan-features li{list-style:none}
+    .plan-features li::before{content:"✓ ";color:var(--accent);font-weight:700}
+
+    .qris-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-top:1rem}
+    .qris-row{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap}
+    .qris-qr{width:180px;height:180px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .qris-qr img{width:160px;height:160px}
+    .qris-info{flex:1;min-width:250px}
+    .qris-info h4{font-weight:600;margin-bottom:0.5rem}
+    .qris-info p{color:var(--text-secondary);font-size:0.83rem;margin-bottom:0.5rem}
+    .qris-amount{font-size:1.3rem;font-weight:700;color:var(--accent);margin:0.5rem 0}
+
+    .proof-upload{border:2px dashed var(--border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;margin-top:1rem;transition:border-color 0.15s}
+    .proof-upload:hover{border-color:var(--accent-border)}
+    .proof-upload input{display:none}
+    .proof-upload .label{color:var(--text-secondary);font-size:0.85rem}
+    .proof-preview{max-width:200px;margin-top:0.5rem;border-radius:6px}
+
+    .status-badge{font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:4px}
+    .status-free{background:var(--text-tertiary);color:#fff}
+    .status-pro{background:var(--accent-dim);color:var(--accent)}
+    .status-pending{background:rgba(234,179,8,0.1);color:var(--yellow)}
+
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#000;padding:0.7rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:500;z-index:100;display:none}
+
+    footer{text-align:center;padding:2rem;border-top:1px solid var(--border);color:var(--text-tertiary);font-size:0.78rem;margin-top:3rem}
+
+    @media(max-width:640px){
+      .nav{padding:0.7rem 1rem}
+      .container{padding:1.5rem 1rem}
+      .qris-row{flex-direction:column;align-items:center}
+      .plan-row{grid-template-columns:1fr}
+    }
+  </style>
+  <link rel="stylesheet" href="/tokens/nerd.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-home"><span class="nav-dot"></span>Nerd Studio</a>
+  <div class="nav-links">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/billing">Billing</a>
+    <a href="/blog/">Writing</a>
+    <a href="/about">About</a>
+  </div>
+</nav>
+
+<main class="container">
+  <h1>Billing</h1>
+  <p class="sub" id="plan-status">Loading your subscription...</p>
+
+  <!-- Plans -->
+  <h2>Plans</h2>
+  <div class="plan-row">
+    <div class="plan-card" id="plan-free">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0<span>/mo</span></div>
+      <p class="plan-desc">For solo makers getting started.</p>
+      <ul class="plan-features">
+        <li>3 Nerd Kanban boards</li>
+        <li>3 Nerd Draw canvases</li>
+        <li>5 shortlinks</li>
+        <li>Dashboard access</li>
+      </ul>
+      <p style="font-size:0.75rem;color:var(--accent);margin-top:0.5rem;font-weight:600">Current plan</p>
+    </div>
+
+    <div class="plan-card featured" id="plan-pro">
+      <div class="plan-badge">RECOMMENDED</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$5<span>/mo</span></div>
+      <p class="plan-desc">For makers shipping regularly.</p>
+      <ul class="plan-features">
+        <li>Unlimited boards & canvases</li>
+        <li>Unlimited shortlinks</li>
+        <li>Google export (Sheets, Slides)</li>
+        <li>AI reminders (WhatsApp)</li>
+        <li>Custom shortlink domain</li>
+      </ul>
+      <button class="btn btn-primary" style="width:100%;margin-top:0.75rem" onclick="showQRIS()">Upgrade to Pro — $5/mo</button>
+    </div>
+  </div>
+
+  <!-- QRIS Payment Section (hidden until upgrade click) -->
+  <div id="qris-section" class="qris-section" style="display:none">
+    <h3>Pay with QRIS</h3>
+    <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem">
+      Scan the QR code with your banking app (GoPay, OVO, DANA, BCA, Mandiri, etc.) to pay.
+      After payment, upload your payment proof below.
+    </p>
+
+    <div class="qris-row">
+      <div class="qris-qr">
+        <!-- QRIS QR Code - generated dynamically -->
+        <img id="qris-img" src="" alt="QRIS QR Code" onerror="this.parentElement.innerHTML='<span style=color:#484f58;font-size:0.8rem>QR Code<br>Loading...</span>'" />
+      </div>
+      <div class="qris-info">
+        <h4>Nerd Studio Pro — Monthly</h4>
+        <div class="qris-amount">Rp 80,000</div>
+        <p>1 bulan akses penuh ke semua fitur Pro.</p>
+        <p style="font-size:0.75rem;color:var(--text-tertiary)">
+          Pembayaran via QRIS diproses manual. Akses Pro aktif dalam 1-24 jam setelah pembayaran dikonfirmasi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Payment Proof Upload -->
+    <div class="proof-upload" id="proof-upload" onclick="document.getElementById('proof-file').click()">
+      <input type="file" id="proof-file" accept="image/*" onchange="handleProofUpload(event)" />
+      <div class="label" id="proof-label">📸 Tap to upload payment proof (screenshot)</div>
+      <img id="proof-preview" class="proof-preview" style="display:none" />
+    </div>
+    <div id="proof-sent" style="display:none;color:var(--accent);margin-top:0.5rem;font-size:0.85rem">
+      ✅ Payment proof uploaded! We'll verify and activate your Pro access within 24 hours.
+    </div>
+
+    <p style="margin-top:1rem;font-size:0.78rem;color:var(--text-tertiary)">
+      Questions? Contact <a href="mailto:hello@nerdstudio.online">hello@nerdstudio.online</a>
+    </p>
+  </div>
+
+  <!-- Current subscription info -->
+  <h2>Subscription</h2>
+  <div class="card" id="current-subscription">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+      <div>
+        <h3>Free Plan <span class="status-badge status-free">FREE</span></h3>
+        <p>You're on the free tier. 3 boards, 3 canvases, 5 shortlinks.</p>
+      </div>
+      <button class="btn btn-primary" onclick="showQRIS()">Upgrade to Pro</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2026 Nerd Studio — Jakarta, Indonesia &middot; <a href="/privacy">Privacy</a> &middot; <a href="/about">About</a></p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Load user from IdP
+(async () => {
+  try {
+    const res = await fetch('https://id.nerdstudio.online/api/me', { credentials: 'include' });
+    if (res.ok) {
+      const user = await res.json();
+      document.getElementById('plan-status').textContent = 'Manage your subscription, ' + (user.name || user.email).split(' ')[0] + '.';
+    } else {
+      document.getElementById('plan-status').textContent = 'Sign in to manage your subscription.';
+    }
+  } catch {
+    document.getElementById('plan-status').textContent = 'Manage your subscription.';
+  }
+})();
+
+function showQRIS() {
+  const section = document.getElementById('qris-section');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth' });
+  // Generate QRIS QR code
+  generateQRIS();
+}
+
+async function generateQRIS() {
+  // Generate QR code via free API with payment details
+  const qrData = 'https://nerdstudio.online/billing/pro-upgrade';
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(qrData);
+  document.getElementById('qris-img').src = qrUrl;
+}
+
+function handleProofUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('proof-preview').src = e.target.result;
+    document.getElementById('proof-preview').style.display = 'block';
+    document.getElementById('proof-label').textContent = '✓ ' + file.name;
+    document.getElementById('proof-sent').style.display = 'block';
+    toast('Payment proof uploaded! We will verify within 24 hours.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+</script>
+
+</body>
+</html>
