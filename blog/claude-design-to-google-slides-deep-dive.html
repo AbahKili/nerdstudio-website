@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Design to Google Slides — Deep Dive — Nerd Studio</title>
+  <meta name="description" content="A solo developer's deep dive into converting Claude Artifacts to Google Slides, covering the watermark gate, OAuth pitfalls, and concurrency rate limiting with real code." />
+  <meta property="og:title" content="Claude Design to Google Slides — Deep Dive" />
+  <meta property="og:description" content="A solo developer's deep dive into converting Claude Artifacts to Google Slides, covering the watermark gate, OAuth pitfalls, and concurrency rate limiting with real code." />
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="https://nerdstudio.online/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-06-01T08:00:00+07:00" />
+  <meta property="article:author" content="Abah" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Claude Design to Google Slides — Deep Dive" />
+  <meta name="twitter:image" content="https://nerdstudio.online/og-image.png" />
+  <link rel="canonical" href="https://nerdstudio.online/blog/claude-design-to-google-slides-deep-dive.html" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8835580597891369" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Claude Design to Google Slides — Deep Dive",
+    "description": "A solo developer's deep dive into converting Claude Artifacts to Google Slides, covering the watermark gate, OAuth pitfalls, and concurrency rate limiting with real code.",
+    "author": { "@type": "Person", "name": "Abah" },
+    "datePublished": "2026-06-01",
+    "publisher": { "@type": "Organization", "name": "Nerd Studio", "url": "https://nerdstudio.online" }
+  }
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#020617;--surface:#0f172a;--border:#1e293b;--accent:#22c55e;--text:#f8fafc;--muted:#94a3b8;--dim:#64748b}
+    body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
+    h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:rgba(2,6,23,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06)}
+    .logo{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+    .logo span{color:var(--accent)}
+    .logo:hover{text-decoration:none}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .container{max-width:680px;margin:0 auto;padding:3rem 1.5rem}
+    h1{font-size:1.75rem;font-weight:700;line-height:1.3;margin-bottom:0.5rem}
+    .post-meta{color:var(--dim);font-size:0.8rem;margin-bottom:2.5rem}
+    .container h2{font-size:1.3rem;font-weight:700;margin:2rem 0 0.75rem;color:var(--accent)}
+    .container p{margin-bottom:1.2rem;color:var(--muted);font-size:0.95rem}
+    .container ul,.container ol{margin:0 0 1.2rem 1.5rem;color:var(--muted)}
+    .container li{margin-bottom:0.4rem}
+    .container strong{color:var(--text)}
+    pre{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;overflow-x:auto;font-size:0.8rem;line-height:1.6;margin-bottom:1.2rem}
+    code{font-family:monospace;font-size:0.85em}
+    pre code{color:var(--text)}
+    footer{text-align:center;padding:2rem;border-top:1px solid rgba(255,255,255,0.06);color:var(--dim);font-size:0.78rem}
+    footer a{color:var(--muted)}
+    @media(max-width:768px){.nav{padding:0.85rem 1.25rem}.container{padding:2rem 1.25rem}h1{font-size:1.35rem}}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="logo">Nerd<span>Studio</span></a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#pricing">Pricing</a>
+    <a href="/blog/">Blog</a>
+    <a href="/news/">News</a>
+  </div>
+</nav>
+<main class="container">
+  <article>
+    <h1>Claude Design to Google Slides — Deep Dive</h1>
+    <p class="post-meta">2026-06-01 · Auto-generated by Nerd Studio</p>
+    <p>You know that feeling when you have a brilliant deck design in Claude Artifacts — beautiful, pixel-perfect, exactly what your client wanted — and then you have to rebuild it manually in Google Slides? Yeah, I felt that pain. So I built a pipeline that takes Claude-generated HTML/CSS designs and transforms them into editable Google Slides presentations. But the path from prototype to production was paved with three massive gotchas: the watermark gate, the concurrency limiter, and Google OAuth's special brand of suffering. Here's the unfiltered story.</p><h2>The Problem: Design-to-Slides Hell</h2><p>I'm a solo developer building in public. For a recent client project, I needed to generate 50+ branded slides from structured content. Claude Artifacts made the design iteration fast — I could tweak colors, layout, and typography in minutes. But the final delivery had to be Google Slides (because that's what the marketing team uses).</p><p>Copy-pasting each slide? Forget it. That's 10 minutes per slide, 8 hours of monotonous work. I needed automation. So I wrote a Node.js script that parses Claude's HTML output, extracts styled elements, and uses the Google Slides API to create slides programmatically. Simple, right? Ha.</p><h2>The Solution: What I Built</h2><p>I created a two-stage pipeline. Stage one: Claude generates a deck as a single HTML file with inline CSS. Each <code>&lt;section&gt;</code> is a slide. Stage two: my Node.js script parses the DOM, extracts text, images, shapes, and their styles (font size, color, alignment, background), then maps them to Google Slides API <code>requests[]</code>.</p><p>Here's a snippet of the core parsing logic:</p><pre><code>const { JSDOM } = require('jsdom');
+const { google } = require('googleapis');
+
+async function parseSlidesFromHTML(htmlContent) {
+  const dom = new JSDOM(htmlContent);
+  const sections = dom.window.document.querySelectorAll('section.slide');
+  
+  const slides = [];
+  sections.forEach((section, index) => {
+    const elements = [];
+    section.querySelectorAll('h1, h2, p, img').forEach(el => {
+      const style = el.getAttribute('style');
+      elements.push({
+        type: el.tagName.toLowerCase(),
+        text: el.textContent,
+        style: parseInlineCSS(style),
+        src: el.tagName === 'IMG' ? el.getAttribute('src') : null
+      });
+    });
+    slides.push({ index, elements });
+  });
+  return slides;
+}</code></pre><p>Then I batch these into Slides API requests. But that's when the first monster showed up.</p><h2>The Watermark Gate</h2><p>My first test run: 10 slides, simple text, no images. It worked! But every slide had a faint "Generated by Nerd Studio" watermark at the bottom. Wait, I didn't add that. Turns out, the Google Slides API <em>silently</em> adds a watermark to presentations created by unverified apps. It's not in the docs — I discovered it by staring at the JSON response for an hour.</p><p>The fix: you must verify your OAuth consent screen with Google (including submitting for verification if you use sensitive scopes like <code>https://www.googleapis.com/auth/presentations</code>). Even then, the watermark only disappears when your app is in "production" status, not "testing." And if you're a solo dev, the verification process is a Kafkaesque nightmare of video recordings, privacy policy URLs, and a 3-week wait. I eventually created a separate "internal" Google Workspace project just to bypass this for my own use.</p><h2>The Concurrency Limiter</h2><p>Next trap: Google Slides API has a per-project quota of 60 requests per 100 seconds. But here's the kicker — each slide creation requires <em>multiple</em> API calls (one to create the slide, one per element). For a 50-slide deck with 5 elements each, that's 250 requests. You'll hit the limit in 4 seconds and get a <code>429: Rate Limit Exceeded</code> error.</p><p>My solution: a simple token-bucket throttler with exponential backoff:</p><pre><code>class RateLimiter {
+  constructor(tokensPerInterval, intervalMs) {
+    this.tokens = tokensPerInterval;
+    this.intervalMs = intervalMs;
+    this.lastRefill = Date.now();
+  }
+
+  async waitForToken() {
+    while (this.tokens <= 0) {
+      const now = Date.now();
+      const elapsed = now - this.lastRefill;
+      if (elapsed >= this.intervalMs) {
+        this.tokens = tokensPerInterval;
+        this.lastRefill = now;
+      } else {
+        await new Promise(r => setTimeout(r, 100));
+      }
+    }
+    this.tokens--;
+  }
+}</code></pre><p>With this, I queue all requests and release them at 50 requests per 100 seconds (leaving headroom). It turned a 5-second job into a 30-second job, but it never fails now.</p><h2>Google OAuth Gotchas</h2><p>Third circle of hell: OAuth tokens. I used a service account initially — works fine for my own Google Workspace. But when I shared the script with a friend, their slides were created in <em>my</em> drive, not theirs. Service accounts are tied to a single Google Workspace domain.</p><p>The fix: switch to OAuth 2.0 with user consent. But then you need a refresh token, which expires after 7 days if the app is unverified. And the refresh token flow requires a redirect URI — which means I had to deploy a tiny Express server just to handle the callback. For a CLI tool. Ridiculous.</p><p>Here's the minimal OAuth setup I ended up with:</p><pre><code>const { google } = require('googleapis');
+const readline = require('readline');
+
+const oauth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLIENT_SECRET,
+  'http://localhost:3000/oauth2callback'
+);
+
+async function getAccessToken() {
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['https://www.googleapis.com/auth/presentations']
+  });
+  console.log('Authorize this app by visiting:', authUrl);
+  
+  // Start a small server to catch the redirect
+  const code = await new Promise((resolve) => {
+    const app = require('express')();
+    app.get('/oauth2callback', (req, res) => {
+      res.send('Authorization successful! You can close this tab.');
+      resolve(req.query.code);
+    });
+    app.listen(3000);
+  });
+  
+  const { tokens } = await oauth2Client.getToken(code);
+  oauth2Client.setCredentials(tokens);
+  return oauth2Client;
+}</code></pre><p>Pro tip: store the refresh token in a local file so you don't re-authenticate every run. But if the token expires, you're back to square one.</p><h2>Key Takeaways</h2><p><strong>1. Google's API docs are aspirational, not accurate.</strong> The watermark behavior, rate limits, and OAuth nuances are learned by debugging, not reading. Budget time for this.</p><p><strong>2. Throttle everything.</strong> Even if you're under quota, Google's APIs have burst limits that aren't documented. A rate limiter is non-negotiable.</p><p><strong>3. Service accounts vs. OAuth 2.0 is a critical decision.</strong> If you're building a tool for others, bite the bullet and implement OAuth with a local server. If it's just for you, service account + domain-wide delegation is simpler.</p><p><strong>4. The watermark is a feature, not a bug.</strong> Google uses it to push developers toward verification. If you're serious about shipping, start the verification process on day one. It takes weeks.</p><h2>Closing Thought</h2><p>Building this pipeline felt like assembling IKEA furniture with a blindfold on — every step revealed a new hidden screw. But once it worked, watching Claude's designs materialize as polished Google Slides was genuinely magical. The takeaway? APIs are never as simple as they advertise. But for a solo dev building in public, the grit of solving these gotchas is what turns a prototype into a tool people actually use. Now if you'll excuse me, I have a verification video to record for Google.</p>
+  </article>
+</main>
+<footer>
+  <p>&copy; 2026 Nerd Studio. <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/news/">News</a></p>
+</footer>
+</body>
+</html>

@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8835580597891369" crossorigin="anonymous"></script>
-  <meta name="description" content="Nerd Studio — Indie software studio from Jakarta. We build practical SaaS tools that solve our own needs first." />
+  <meta name="description" content="Nerd Studio — Practical SaaS tools for creators, educators, and small teams. Project management, whiteboards, and microsites built from real workflows." />
   <link rel="canonical" href="https://nerdstudio.online" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -17,7 +16,7 @@
   <meta property="og:image" content="https://nerdstudio.online/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  <title>Nerd Studio — Indie SaaS from Jakarta</title>
+  <title>Nerd Studio — Practical SaaS Tools for Teams &amp; Creators</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -147,29 +146,27 @@
 <body>
 
 <nav class="nav" aria-label="Main">
-  <a href="/" class="nav-home"><img src="/tokens/logo.png" alt="Nerd Studio" style="height:28px"></a>
+  <a href="/" class="nav-home"><img src="/tokens/logo-wordmark.png" alt="Nerd Studio" style="height:28px;width:auto"></a>
   <div class="nav-links">
     <a href="/blog/">Writing</a>
     <a href="/about">About</a>
     <a href="/privacy">Privacy</a>
-    <a href="/dashboard" class="nav-cta" style="color:#000">Sign in</a>
+    <a href="#" class="nav-cta" id="nav-cta" style="color:#000" onclick="doLogin();return false">Sign in</a>
   </div>
 </nav>
 
 <!-- Hero -->
 <section class="hero">
-  <h1>Tools we use.<br><em>Shared with you.</em></h1>
-  <p>We build SaaS that solves our own workflow problems. If it works for us, we open it to others. No enterprise roadmaps. No bloat. Just practical software from Jakarta.</p>
+  <h1>Practical tools for <br><em>creators, educators, and small teams.</em></h1>
+  <p>Project management, whiteboards, and collaborative microsites — built from real workflows, not enterprise fantasies. Every product started as an internal tool solving an actual problem.</p>
   <div class="hero-actions">
-    <a href="#products" class="btn btn-primary">See what we build</a>
-    <a href="/blog/" class="btn btn-ghost">Read our writing</a>
+    <a href="https://board.nerdstudio.online" class="btn btn-primary">Start with Nerd Board — Free</a>
+    <a href="#products" class="btn btn-ghost">See all products</a>
   </div>
   <div class="hero-meta">
     <span>🇮🇩 Jakarta</span>
     <span>·</span>
-    <span>Independent studio</span>
-    <span>·</span>
-    <span>Consumer-driven</span>
+    <span>Built and used daily by our team</span>
     <span>·</span>
     <span>Ships weekly</span>
   </div>
@@ -183,22 +180,46 @@
 
   <div class="product-grid">
     <a href="https://board.nerdstudio.online" class="product-card">
+      <img src="/img/board-screenshot.png" alt="Nerd Board — Kanban, Table, and Timeline views" style="width:100%;border-radius:6px;margin-bottom:12px;border:1px solid var(--border)" loading="lazy" />
       <h3>Nerd Board</h3>
       <p>Project management with Kanban, Table, and Timeline views. Share boards with editors, commenters, or viewers — Google Calendar sync, Sheets & Slides export.</p>
       <span class="product-url">board.nerdstudio.online →</span>
     </a>
 
-    <a href="https://skip.my.id" class="product-card">
-      <h3>skip.my.id</h3>
-      <p>Custom short links with collaborative microsite building. Build landing pages together with your team. QR codes, analytics, and custom domains included.</p>
-      <span class="product-url">skip.my.id →</span>
-    </a>
-
     <a href="https://draw.nerdstudio.online" class="product-card">
+      <img src="/img/draw-screenshot.png" alt="Nerd Draw — Freeform whiteboard" style="width:100%;border-radius:6px;margin-bottom:12px;border:1px solid var(--border)" loading="lazy" />
       <h3>Nerd Draw</h3>
-      <p>Freeform whiteboard with a hand-drawn feel. Sketch diagrams, wireframes, and illustrations. Sign in with your Nerd Studio account — all drawings saved to your dashboard.</p>
+      <p>Freeform whiteboard with a hand-drawn feel. Sketch diagrams, wireframes, and illustrations. All drawings saved to your dashboard.</p>
       <span class="product-url">draw.nerdstudio.online →</span>
     </a>
+
+    <a href="https://skip.my.id" class="product-card">
+      <img src="/img/skip-screenshot.png" alt="skip.my.id — Short links and microsites" style="width:100%;border-radius:6px;margin-bottom:12px;border:1px solid var(--border)" loading="lazy" />
+      <h3>skip.my.id</h3>
+      <p>Custom short links with microsite building. QR codes, analytics, and custom domains. Part of the Nerd Studio ecosystem.</p>
+      <span class="product-url">skip.my.id →</span>
+    </a>
+  </div>
+</section>
+
+<!-- Social Proof -->
+<section class="section" id="trust">
+  <div class="section-label">Trusted By</div>
+  <h2>Built and used daily.</h2>
+  <p>Every product is actively maintained and used by real people every day.</p>
+  <div class="build-grid" style="text-align:center">
+    <div class="build-item" style="border-left-color:var(--accent)">
+      <h4>45+</h4>
+      <p>short links created on skip.my.id</p>
+    </div>
+    <div class="build-item" style="border-left-color:var(--accent)">
+      <h4>33+</h4>
+      <p>boards actively managed on Nerd Board</p>
+    </div>
+    <div class="build-item" style="border-left-color:var(--accent)">
+      <h4>15+</h4>
+      <p>drawings created on Nerd Draw weekly</p>
+    </div>
   </div>
 </section>
 
@@ -254,10 +275,18 @@
 
 <!-- CTA -->
 <section class="cta">
-  <h2>We read every email.</h2>
-  <p>Questions, feedback, bug reports, or just want to chat about indie SaaS? We're here.</p>
+  <h2>Built by an indie team in Jakarta.</h2>
+  <p>We got tired of bloated software that charges more every year while solving fewer problems. So we started building our own. Most products begin as internal tools — if they survive our daily use, we release them publicly.</p>
   <a href="mailto:hello@nerdstudio.online" class="btn btn-primary">hello@nerdstudio.online</a>
-  <p class="cta-contact">Jakarta, Indonesia · <a href="https://github.com/AbahKili">GitHub</a> · <a href="/blog/">Writing</a> · <a href="/news/">Changelog</a></p>
+  <p class="cta-contact">Jakarta, Indonesia · <a href="https://github.com/AbahKili" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="/blog/">Writing</a> · <a href="/news/">Changelog</a></p>
+</section>
+
+<!-- Newsletter -->
+<section class="section" style="text-align:center;border-top:1px solid var(--border)">
+  <div class="section-label">Stay Updated</div>
+  <h2>Build Log</h2>
+  <p>Monthly notes about AI, indie SaaS, and product building. No spam, unsubscribe anytime.</p>
+  <a href="mailto:hello@nerdstudio.online?subject=Subscribe%20to%20Build%20Log" class="btn btn-primary">Subscribe — Free</a>
 </section>
 
 <footer>
@@ -270,6 +299,46 @@
   </nav>
   <p>&copy; 2026 Nerd Studio — Jakarta, Indonesia</p>
 </footer>
+
+<script>
+var REDIRECT_URI = 'https://nerdstudio.online';
+var AUTH_URL = 'https://id.nerdstudio.online/api/authorize?client_id=nerdstudio&redirect_uri=' + encodeURIComponent(REDIRECT_URI);
+
+function doLogin() {
+  window.location.href = AUTH_URL;
+}
+
+// Check if already logged in
+var token = localStorage.getItem('nerdstudio_token') || localStorage.getItem('board-token');
+if (token) {
+  fetch('https://id.nerdstudio.online/api/me', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(u) {
+      if (u && u.name) {
+        var c = document.getElementById('nav-cta');
+        if (c) { c.textContent = u.name.split(' ')[0]; c.href = '/dashboard'; c.onclick = null; c.title = u.email; }
+      }
+    }).catch(function(){});
+}
+
+// OAuth callback — IdP redirected back with ?code=
+var params = new URLSearchParams(window.location.search);
+var code = params.get('code');
+if (code) {
+  window.history.replaceState({}, '', '/');
+  fetch('https://nerdstudio.online/api/pay/auth/exchange', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: code, redirect_uri: REDIRECT_URI, client_id: 'nerdstudio' })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d.token) {
+      localStorage.setItem('nerdstudio_token', d.token);
+      localStorage.setItem('nerdstudio_user', JSON.stringify(d.user));
+      window.location.href = '/dashboard';
+    }
+  }).catch(function(){});
+}
+</script>
 
 </body>
 </html>

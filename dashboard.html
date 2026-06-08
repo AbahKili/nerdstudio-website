@@ -103,13 +103,6 @@
       <span class="url">board.nerdstudio.online →</span>
     </a>
 
-    <a href="https://pptx.nerdstudio.online" class="product-card">
-      <span class="badge">convert</span>
-      <h3>Claude Design → Google Slides</h3>
-      <p>Turn Claude-generated designs into editable presentations. One URL, one click, delivered to your Drive.</p>
-      <span class="url">pptx.nerdstudio.online →</span>
-    </a>
-
     <a href="https://skip.my.id" class="product-card">
       <span class="badge">links</span>
       <h3>skip.my.id</h3>
@@ -127,14 +120,14 @@
 
   <!-- Billing -->
   <div class="section-label">Billing</div>
-  <div class="billing-card">
-    <h3>Free Plan</h3>
-    <p>You're currently on the free tier. Upgrade to Pro for unlimited boards, Google export, and AI reminders.</p>
+  <div class="billing-card" id="billing-card">
+    <h3 id="billing-title">Free Plan</h3>
+    <p id="billing-desc">You're currently on the free tier. Upgrade to Pro for unlimited boards, Google export, and AI reminders.</p>
     <div class="billing-row">
-      <div class="billing-status">
+      <div class="billing-status" id="billing-status">
         <strong>Gratis</strong> — 3 boards, 10 canvases, 20 shortlinks
       </div>
-      <a href="/upgrade" class="btn btn-primary">Upgrade to Pro — Rp 99K/mo</a>
+      <a href="/upgrade" class="btn btn-primary" id="billing-btn">Upgrade to Pro — Rp 99K/mo</a>
     </div>
   </div>
 </main>
@@ -144,7 +137,7 @@
 </footer>
 
 <script>
-// Check IdP session
+// Check IdP session and membership
 (async () => {
   try {
     const res = await fetch('https://id.nerdstudio.online/api/me', { credentials: 'include' });
@@ -154,6 +147,18 @@
       document.getElementById('subtitle').textContent = 'Your workspace. All your tools in one place.';
       document.getElementById('login-btn').style.display = 'none';
       document.getElementById('logout-btn').style.display = '';
+
+      // Check membership
+      const plan = user.membership || user.plan || 'free';
+      const expires = user.membership_expires_at;
+      if (plan === 'premium' && expires && new Date(expires) > new Date()) {
+        const expDate = new Date(expires).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('billing-title').textContent = 'Nerd Studio Pro';
+        document.getElementById('billing-desc').textContent = 'You are a Pro member. All premium features unlocked.';
+        document.getElementById('billing-status').innerHTML = '<strong>Pro</strong> — berlaku hingga ' + expDate;
+        document.getElementById('billing-btn').textContent = 'Manage Membership';
+        document.getElementById('billing-btn').href = '/upgrade';
+      }
     }
   } catch {}
 })();
