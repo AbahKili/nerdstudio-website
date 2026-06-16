@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?!= config.branding.title || 'Form' ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+    // ═══ INJECT DATA WILAYAH (HARDCODE) ═══
+    // PASTIKAN <?!= ?> (double-force-print) — TIDAK BOLEH <?= >
+    // agar JSON tidak di-escape menjadi HTML entities
+    var DATA_WILAYAH = {
+      provinsi: <?!= JSON.stringify(dataProv) ?>,
+      kabkota:  <?!= JSON.stringify(dataKab) ?>,
+      kecamatan: <?!= JSON.stringify(dataKec) ?>
+    };
+
+    // ═══ CONFIG ═══
+    var CONFIG = <?!= JSON.stringify(config) ?>;
+
+    // Proteksi null
+    if (!CONFIG.branding) CONFIG.branding = {};
+    if (!CONFIG.regions) CONFIG.regions = {};
+    if (!CONFIG.fields) CONFIG.fields = [];
+
+    // ═══ THEME ═══
+    var THEMES = {
+      dark:  { bg:'#020617', text:'#f8fafc', card:'rgba(15,23,42,0.85)', border:'rgba(51,65,85,0.4)', inputBg:'#0f172a', inputBorder:'#334155', inputText:'#f8fafc', btnBg:'#0ea5e9', btnText:'#fff', muted:'#94a3b8' },
+      light: { bg:'#f1f5f9', text:'#0f172a', card:'#fff', border:'#e2e8f0', inputBg:'#f8fafc', inputBorder:'#cbd5e1', inputText:'#0f172a', btnBg:'#2563eb', btnText:'#fff', muted:'#64748b' },
+      corporate: { bg:'#eff6ff', text:'#1e3a8a', card:'#fff', border:'#bfdbfe', inputBg:'#f8fafc', inputBorder:'#93c5fd', inputText:'#1e3a8a', btnBg:'#1d4ed8', btnText:'#fff', muted:'#64748b' }
+    };
+    var T = THEMES[CONFIG.branding.themeStyle] || THEMES.dark;
+
+    // ═══ STATE ═══
+    var currentPage = 1;
+    var totalPages = (CONFIG.regions.provinsi || CONFIG.regions.kabkota || CONFIG.regions.kecamatan) ? 2 : 1;
+    var selectedProv = '', selectedKab = '', selectedKec = '';
+    </script>
+
+    <style>
+    body { background: <?!= T.bg ?>; color: <?!= T.text ?>; font-family: 'Inter', sans-serif; margin:0; padding:0; }
+    h1 { font-family: 'Outfit', sans-serif; }
+    .glass { background: <?!= T.card ?>; border: 1px solid <?!= T.border ?>; backdrop-filter: blur(16px); border-radius: 14px; }
+    .input-field { background: <?!= T.inputBg ?>; border: 1px solid <?!= T.inputBorder ?>; color: <?!= T.inputText ?>; border-radius: 10px; padding: 0.75rem 1rem; width: 100%; box-sizing: border-box; font-size: 0.9rem; }
+    .input-field:focus { outline: none; ring: 2px solid <?!= T.btnBg ?>; }
+    .btn-theme { background: <?!= T.btnBg ?>; color: <?!= T.btnText ?>; border: none; border-radius: 10px; padding: 0.75rem 2rem; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: opacity 0.2s; }
+    .btn-theme:hover { opacity: 0.9; }
+    .btn-theme:disabled { opacity: 0.5; cursor: not-allowed; }
+    .loader { border: 2px solid rgba(255,255,255,0.2); border-left-color: <?!= T.btnBg ?>; border-radius: 50%; width: 1.25rem; height: 1.25rem; animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23<?!= T.muted.replace('#','') ?>' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 1rem center; background-repeat: no-repeat; background-size: 1.2em 1.2em; padding-right: 2.5rem; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div style="text-align:center;padding:2rem 1rem 1rem;">
+  <? if (config.branding.logoUrl) { ?>
+    <img src="<?!= config.branding.logoUrl ?>" alt="Logo" style="max-height:48px;margin-bottom:0.75rem;">
+  <? } ?>
+  <h1 style="font-size:1.6rem;font-weight:700;margin:0;"><?!= config.branding.title || 'Form Portal' ?></h1>
+  <? if (config.branding.description) { ?>
+    <p style="color:<?!= T.muted ?>;font-size:0.9rem;margin-top:0.5rem;"><?!= config.branding.description ?></p>
+  <? } ?>
+  <!-- Progress -->
+  <? if (totalPages > 1) { ?>
+    <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:1.5rem;" id="progressDots">
+      <div id="dot1" style="width:32px;height:6px;border-radius:3px;background:<?!= T.btnBg ?>;"></div>
+      <div id="dot2" style="width:32px;height:6px;border-radius:3px;background:<?!= T.border ?>;"></div>
+    </div>
+  <? } ?>
+</div>
+
+<!-- FORM CONTAINER -->
+<div style="max-width:520px;margin:0 auto;padding:0 1rem 4rem;">
+<form id="mainForm" onsubmit="handleSubmit(event)" class="glass" style="padding:1.5rem;">
+
+  <!-- ═══ PAGE 1: WILAYAH ═══ -->
+  <div id="page1" style="display:block;">
+    <p style="font-size:0.85rem;color:<?!= T.muted ?>;margin-bottom:1rem;">Lengkapi data wilayah Anda</p>
+
+    <? if (config.regions.provinsi) { ?>
+    <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.3rem;">Provinsi</label>
+    <select id="selProv" class="input-field" onchange="onProvChange()" required>
+      <option value="">-- Pilih Provinsi --</option>
+    </select><br><br>
+    <? } ?>
+
+    <? if (config.regions.kabkota) { ?>
+    <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.3rem;">Kabupaten / Kota</label>
+    <select id="selKab" class="input-field" onchange="onKabChange()" required disabled>
+      <option value="">-- Pilih Kab/Kota --</option>
+    </select><br><br>
+    <? } ?>
+
+    <? if (config.regions.kecamatan) { ?>
+    <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.3rem;">Kecamatan</label>
+    <select id="selKec" class="input-field" onchange="onKecChange()" required disabled>
+      <option value="">-- Pilih Kecamatan --</option>
+    </select><br><br>
+    <? } ?>
+
+    <? if (totalPages > 1) { ?>
+    <div style="text-align:right;margin-top:1.5rem;">
+      <button type="button" class="btn-theme" onclick="goToPage2()" id="btnNext" disabled>
+        Lanjutkan <i class="fa-solid fa-arrow-right" style="margin-left:0.5rem;"></i>
+      </button>
+    </div>
+    <? } ?>
+  </div>
+
+  <!-- ═══ PAGE 2: FORM FIELDS + SUBMIT ═══ -->
+  <div id="page2" style="display:<?= totalPages === 1 ? 'block' : 'none' ?>;">
+    <p style="font-size:0.85rem;color:<?!= T.muted ?>;margin-bottom:1rem;">Lengkapi data diri Anda</p>
+
+    <? config.fields.forEach(function(field) { ?>
+    <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.3rem;"><?!= field.label ?></label>
+    <input type="text" name="<?!= field.entry ?>" class="input-field" required>
+    <? if (field.helper) { ?>
+      <small style="color:<?!= T.muted ?>;display:block;margin-bottom:1rem;"><?!= field.helper ?></small>
+    <? } else { ?>
+      <br><br>
+    <? } ?>
+    <? }); ?>
+
+    <? if (totalPages > 1) { ?>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;">
+      <button type="button" class="btn-theme" style="background:transparent;border:1px solid <?!= T.border ?>;color:<?!= T.text ?>;" onclick="goToPage1()">
+        <i class="fa-solid fa-arrow-left" style="margin-right:0.5rem;"></i> Kembali
+      </button>
+      <button type="submit" class="btn-theme" id="btnSubmit">
+        Kirim Pendaftaran <i class="fa-solid fa-paper-plane" style="margin-left:0.5rem;"></i>
+      </button>
+    </div>
+    <? } else { ?>
+    <div style="text-align:right;margin-top:1.5rem;">
+      <button type="submit" class="btn-theme" id="btnSubmit">
+        Kirim Pendaftaran <i class="fa-solid fa-paper-plane" style="margin-left:0.5rem;"></i>
+      </button>
+    </div>
+    <? } ?>
+  </div>
+
+  <!-- Loading indicator -->
+  <div id="loadingDiv" class="hidden" style="text-align:center;padding:1.5rem;">
+    <span class="loader"></span>
+    <p style="color:<?!= T.muted ?>;font-size:0.85rem;margin-top:0.75rem;">Mengirim data...</p>
+  </div>
+
+</form>
+</div>
+
+<!-- Hidden iframe for Google Form POST -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="onPostComplete()"></iframe>
+
+<!-- ═══ JAVASCRIPT ═══ -->
+<script>
+(function() {
+  // ── INIT DROPDOWNS ────────────────────────────────────────
+
+  function initProvinsi() {
+    var sel = document.getElementById('selProv');
+    if (!sel) return;
+    // PROVINSI is Object { kode: nama } — convert to sorted array
+    var list = Object.keys(DATA_WILAYAH.provinsi).map(function(k) {
+      return { kode: k, nama: DATA_WILAYAH.provinsi[k] };
+    });
+    // SORT: convert to array first, then sort
+    list.sort(function(a, b) {
+      return a.nama.localeCompare(b.nama, 'id');
+    });
+    list.forEach(function(p) {
+      var o = document.createElement('option');
+      o.value = p.kode;
+      o.textContent = p.nama;
+      sel.appendChild(o);
+    });
+  }
+
+  function onProvChange() {
+    selectedProv = document.getElementById('selProv').value;
+    var selKab = document.getElementById('selKab');
+    var selKec = document.getElementById('selKec');
+    if (!selKab) { checkNextEnabled(); return; }
+
+    selKab.innerHTML = '<option value="">-- Pilih Kab/Kota --</option>';
+    if (selKec) selKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+    selKab.disabled = !selectedProv;
+    if (selKec) selKec.disabled = true;
+
+    if (!selectedProv) { checkNextEnabled(); return; }
+
+    // KABKOTA is Object { kode_prov: [[kode, nama], ...] } — indexed by parent
+    var items = DATA_WILAYAH.kabkota[selectedProv] || [];
+    var list = items.map(function(row) { return { kode: row[0], nama: row[1] }; });
+    list.sort(function(a, b) { return a.nama.localeCompare(b.nama, 'id'); });
+
+    list.forEach(function(k) {
+      var o = document.createElement('option');
+      o.value = k.kode;
+      o.textContent = k.nama;
+      selKab.appendChild(o);
+    });
+    selKab.disabled = false;
+    checkNextEnabled();
+  }
+
+  function onKabChange() {
+    selectedKab = document.getElementById('selKab').value;
+    var selKec = document.getElementById('selKec');
+    if (!selKec) { checkNextEnabled(); return; }
+
+    selKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+    selKec.disabled = !selectedKab;
+
+    if (!selectedKab) { checkNextEnabled(); return; }
+
+    var items = DATA_WILAYAH.kecamatan[selectedKab] || [];
+    var list = items.map(function(row) { return { kode: row[0], nama: row[1] }; });
+    list.sort(function(a, b) { return a.nama.localeCompare(b.nama, 'id'); });
+
+    list.forEach(function(k) {
+      var o = document.createElement('option');
+      o.value = k.kode;
+      o.textContent = k.nama;
+      selKec.appendChild(o);
+    });
+    selKec.disabled = false;
+    checkNextEnabled();
+  }
+
+  function onKecChange() {
+    selectedKec = document.getElementById('selKec').value;
+    checkNextEnabled();
+  }
+
+  function checkNextEnabled() {
+    var btn = document.getElementById('btnNext');
+    if (!btn) return;
+    var ok = true;
+    if (document.getElementById('selProv') && !document.getElementById('selProv').value) ok = false;
+    if (document.getElementById('selKab') && !document.getElementById('selKab').value) ok = false;
+    if (document.getElementById('selKec') && !document.getElementById('selKec').value) ok = false;
+    btn.disabled = !ok;
+  }
+
+  // ── PAGE NAVIGATION ───────────────────────────────────────
+
+  window.goToPage2 = function() {
+    currentPage = 2;
+    document.getElementById('page1').style.display = 'none';
+    document.getElementById('page2').style.display = 'block';
+    document.getElementById('dot1').style.background = '<?!= T.muted ?>';
+    document.getElementById('dot2').style.background = '<?!= T.btnBg ?>';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.goToPage1 = function() {
+    currentPage = 1;
+    document.getElementById('page2').style.display = 'none';
+    document.getElementById('page1').style.display = 'block';
+    document.getElementById('dot1').style.background = '<?!= T.btnBg ?>';
+    document.getElementById('dot2').style.background = '<?!= T.border ?>';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ── SUBMIT: Direct POST to Google Form via hidden iframe ───
+
+  window.handleSubmit = function(e) {
+    e.preventDefault();
+
+    var btn = document.getElementById('btnSubmit');
+    var loader = document.getElementById('loadingDiv');
+    btn.disabled = true;
+    loader.classList.remove('hidden');
+
+    // Build form data
+    var formData = new FormData(document.getElementById('mainForm'));
+
+    // Add wilayah selection as hidden fields
+    if (selectedProv) formData.append('entry_wilayah_provinsi', DATA_WILAYAH.provinsi[selectedProv] || '');
+    if (selectedKab) {
+      var kabList = (DATA_WILAYAH.kabkota[selectedProv] || []).filter(function(r) { return r[0] === selectedKab; });
+      if (kabList.length > 0) formData.append('entry_wilayah_kabkota', kabList[0][1]);
+    }
+    if (selectedKec) {
+      var kecList = (DATA_WILAYAH.kecamatan[selectedKab] || []).filter(function(r) { return r[0] === selectedKec; });
+      if (kecList.length > 0) formData.append('entry_wilayah_kecamatan', kecList[0][1]);
+    }
+
+    // POST to Google Form via hidden iframe
+    var iframe = document.getElementById('hidden_iframe');
+    var formEl = document.createElement('form');
+    formEl.method = 'POST';
+    formEl.action = CONFIG.formActionUrl;
+    formEl.target = 'hidden_iframe';
+    formEl.style.display = 'none';
+
+    formData.forEach(function(value, key) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      formEl.appendChild(input);
+    });
+
+    document.body.appendChild(formEl);
+    formEl.submit();
+    document.body.removeChild(formEl);
+  };
+
+  window.onPostComplete = function() {
+    var btn = document.getElementById('btnSubmit');
+    var loader = document.getElementById('loadingDiv');
+    loader.classList.add('hidden');
+
+    Swal.fire({
+      title: CONFIG.branding.successTitle || 'Berhasil!',
+      text: CONFIG.branding.successMessage || 'Data Anda telah terkirim.',
+      icon: 'success',
+      confirmButtonColor: '<?!= T.btnBg ?>',
+      customClass: { popup: 'glass' }
+    }).then(function() {
+      // Reset form
+      document.getElementById('mainForm').reset();
+      if (document.getElementById('selProv')) document.getElementById('selProv').value = '';
+      if (document.getElementById('selKab')) { document.getElementById('selKab').innerHTML = '<option value="">-- Pilih Kab/Kota --</option>'; document.getElementById('selKab').disabled = true; }
+      if (document.getElementById('selKec')) { document.getElementById('selKec').innerHTML = '<option value="">-- Pilih Kecamatan --</option>'; document.getElementById('selKec').disabled = true; }
+      if (totalPages > 1) goToPage1();
+      btn.disabled = false;
+    });
+  };
+
+  // ── BOOT ──────────────────────────────────────────────────
+
+  initProvinsi();
+  // Auto-select if only one option (for small provinces)
+  if (CONFIG.regions.provinsi && document.getElementById('selProv').options.length === 2) {
+    document.getElementById('selProv').selectedIndex = 1;
+    onProvChange();
+  }
+  checkNextEnabled();
+
+})();
+</script>
+</body>
+</html>

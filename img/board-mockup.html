@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><style>
+body{margin:0;font-family:system-ui;background:#0f172a;color:#f8fafc}
+header{background:#1e293b;padding:16px 24px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:1.2rem;font-weight:600;margin:0}
+.badge{background:#22c55e20;color:#22c55e;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:500}
+.board{display:flex;gap:16px;padding:20px;overflow-x:auto;min-height:400px}
+.column{background:#1e293b;border-radius:12px;min-width:260px;padding:12px}
+.col-head{font-weight:600;font-size:0.85rem;margin-bottom:8px;padding:0 8px;color:#94a3b8}
+.card{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;margin-bottom:8px;font-size:0.8rem}
+.card:hover{border-color:#22c55e}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:0.65rem;margin-top:6px}
+.tag-high{background:#ef444420;color:#ef4444}
+.tag-med{background:#f59e0b20;color:#f59e0b}
+.tag-low{background:#22c55e20;color:#22c55e}
+</style></head><body>
+<header><h1>📋 Nerd Board — Project Tracker</h1><span class="badge">3 boards</span></header>
+<div class="board">
+<div class="column"><div class="col-head">📝 To Do (4)</div>
+<div class="card">Setup authentication flow<span class="tag tag-high">urgent</span></div>
+<div class="card">Design landing page<span class="tag tag-med">in progress</span></div>
+<div class="card">Write API docs<span class="tag tag-low">low</span></div>
+<div class="card">Database schema review</div>
+</div>
+<div class="column"><div class="col-head">🔄 In Progress (2)</div>
+<div class="card">User dashboard UI<span class="tag tag-med">review</span></div>
+<div class="card">Payment integration testing</div>
+</div>
+<div class="column"><div class="col-head">✅ Done (5)</div>
+<div class="card">Project setup<span class="tag tag-low">done</span></div>
+<div class="card">CI/CD pipeline</div>
+<div class="card">Email notification system</div>
+</div>
+</body></html>

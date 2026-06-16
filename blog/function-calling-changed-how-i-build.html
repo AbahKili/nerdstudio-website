@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Function Calling Changed How I Build — Nerd Studio</title>
+  <meta name="description" content="How function calling turns Claude from a chat assistant into an autonomous developer that runs shell commands, searches the web, and builds software with feedback loops." />
+  <meta property="og:title" content="Function Calling Changed How I Build" />
+  <meta property="og:description" content="How function calling turns Claude from a chat assistant into an autonomous developer that runs shell commands, searches the web, and builds software with feedback loops." />
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="https://nerdstudio.online/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-06-15T08:00:00+07:00" />
+  <meta property="article:author" content="Abah" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Function Calling Changed How I Build" />
+  <meta name="twitter:image" content="https://nerdstudio.online/og-image.png" />
+  <link rel="canonical" href="https://nerdstudio.online/blog/function-calling-changed-how-i-build.html" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8835580597891369" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Function Calling Changed How I Build",
+    "description": "How function calling turns Claude from a chat assistant into an autonomous developer that runs shell commands, searches the web, and builds software with feedback loops.",
+    "author": { "@type": "Person", "name": "Abah" },
+    "datePublished": "2026-06-15",
+    "publisher": { "@type": "Organization", "name": "Nerd Studio", "url": "https://nerdstudio.online" }
+  }
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#020617;--surface:#0f172a;--border:#1e293b;--accent:#22c55e;--text:#f8fafc;--muted:#94a3b8;--dim:#64748b}
+    body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
+    h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:rgba(2,6,23,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06)}
+    .logo{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+    .logo span{color:var(--accent)}
+    .logo:hover{text-decoration:none}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);font-size:0.85rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .container{max-width:680px;margin:0 auto;padding:3rem 1.5rem}
+    h1{font-size:1.75rem;font-weight:700;line-height:1.3;margin-bottom:0.5rem}
+    .post-meta{color:var(--dim);font-size:0.8rem;margin-bottom:2.5rem}
+    .container h2{font-size:1.3rem;font-weight:700;margin:2rem 0 0.75rem;color:var(--accent)}
+    .container p{margin-bottom:1.2rem;color:var(--muted);font-size:0.95rem}
+    .container ul,.container ol{margin:0 0 1.2rem 1.5rem;color:var(--muted)}
+    .container li{margin-bottom:0.4rem}
+    .container strong{color:var(--text)}
+    pre{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;overflow-x:auto;font-size:0.8rem;line-height:1.6;margin-bottom:1.2rem}
+    code{font-family:monospace;font-size:0.85em}
+    pre code{color:var(--text)}
+    footer{text-align:center;padding:2rem;border-top:1px solid rgba(255,255,255,0.06);color:var(--dim);font-size:0.78rem}
+    footer a{color:var(--muted)}
+    @media(max-width:768px){.nav{padding:0.85rem 1.25rem}.container{padding:2rem 1.25rem}h1{font-size:1.35rem}}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="logo">Nerd<span>Studio</span></a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#pricing">Pricing</a>
+    <a href="/blog/">Blog</a>
+    <a href="/news/">News</a>
+  </div>
+</nav>
+<main class="container">
+  <article>
+    <h1>Function Calling Changed How I Build</h1>
+    <p class="post-meta">2026-06-15 · Auto-generated by Nerd Studio</p>
+    <p>I remember the exact moment I stopped treating Claude like a chat buddy and started treating it like a junior developer with a terminal. It was 2 AM, I was debugging a Kubernetes ingress issue, and I realized I'd spent more time copy-pasting YAML into the chat than actually fixing the problem. Then it hit me: what if Claude could just <em>run</em> the commands itself? That night, I wired up function calling for the first time, and I haven't built software the same way since.</p><h2>The Problem: Chat Is a Dead End</h2><p>For months, I used Claude the way most developers do: describe a problem, get a solution, copy the code, paste it into my terminal, run it, see an error, copy the error back, repeat. It worked, but it was slow. Every iteration required manual context switching — alt-tabbing between browser and terminal, reading error messages, formatting them for the AI. I was essentially acting as a human API gateway.</p><p>The deeper issue was trust. I couldn't verify the AI's output without running it myself. And running it myself meant leaving the chat. The conversation loop was broken by the physical act of executing code. I needed a way for Claude to <em>do</em> things, not just <em>say</em> things.</p><h2>The Solution: Giving Claude Hands</h2><p>I built a simple Node.js server that exposes a set of tools as JSON-RPC endpoints. Each tool is a function Claude can call — <code>run_shell_command</code>, <code>search_web</code>, <code>read_file</code>, <code>write_file</code>. The key insight was that function calling isn't about giving the AI more capabilities; it's about giving it <em>feedback loops</em>.</p><p>Here's the core of what I built:</p><pre><code>const tools = [
+  {
+    name: 'run_shell_command',
+    description: 'Execute a shell command and return stdout/stderr',
+    parameters: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', description: 'The shell command to run' },
+        cwd: { type: 'string', description: 'Working directory' }
+      },
+      required: ['command']
+    }
+  },
+  {
+    name: 'search_web',
+    description: 'Search the web and return top results',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' }
+      },
+      required: ['query']
+    }
+  }
+];</code></pre><p>When Claude decides it needs to run a command, it returns a special response with a <code>tool_calls</code> field. My server intercepts that, executes the tool, and sends the result back to Claude as a new message. The AI then uses that result to decide the next step. It's a loop — but now Claude is driving.</p><p>The first time I asked Claude to "fix the failing test in src/tests/api.test.js" and watched it run <code>npm test</code>, read the output, edit the file, and re-run until green — I actually laughed out loud. It was like watching a robot learn to ride a bike.</p><h2>What I Learned: The Good, the Bad, the Dangerous</h2><p>First, the good. Function calling turns Claude into an autonomous agent for well-scoped tasks. I now use it for:</p><ul><li><strong>Database migrations:</strong> "Claude, add a 'role' column to the users table and update all existing users to 'member'." It runs the SQL, checks the schema, validates the data, and commits.</li><li><strong>API debugging:</strong> "This endpoint returns 500. Figure out why." It curls the endpoint, checks server logs, inspects database state, and often finds the bug before I finish my coffee.</li><li><strong>Web research + code generation:</strong> "Find the latest Stripe API for subscriptions and write a Node.js integration." It searches the web, reads docs, and writes tested code.</li></ul><p>But there are sharp edges. The biggest risk is <strong>unintended side effects</strong>. Claude once ran <code>rm -rf node_modules</code> when I asked it to "clean up the project." I hadn't scoped the allowed commands. Now I sandbox everything — the <code>run_shell_command</code> tool only works inside a dedicated project directory, and I've blacklisted destructive commands like <code>rm</code>, <code>dd</code>, and <code>chmod -R</code>.</p><p>Another lesson: <strong>context windows fill up fast</strong>. Every tool call adds the full stdout/stderr to the conversation. For long-running tasks, I now truncate outputs to the last 100 lines and summarize intermediate steps using a secondary LLM call.</p><h2>Key Takeaways for Developers</h2><p>If you're thinking about adding function calling to your workflow, here's what I wish I'd known from day one:</p><ol><li><strong>Start with read-only tools.</strong> Give Claude the ability to read files, search the web, and run non-destructive commands first. Add write capabilities gradually, with explicit user confirmation for each destructive action.</li><li><strong>Use structured outputs for tool results.</strong> Return JSON, not raw text. Claude parses structured data much more reliably. For example, instead of returning <code>"Error: file not found"</code>, return <code>{ "status": "error", "code": 404, "message": "file not found" }</code>.</li><li><strong>Implement rate limiting and timeouts.</strong> Claude will happily run infinite loops if you let it. I set a 30-second timeout per tool call and a 5-minute overall session limit. The AI can request extensions, but it has to justify them.</li><li><strong>Log everything.</strong> Every tool call, every result, every decision. When Claude does something unexpected (and it will), you need to trace the chain of reasoning. I log to a local SQLite database with timestamps and conversation IDs.</li></ol><p>Honestly, the biggest shift was mental. I stopped thinking of Claude as a <em>chatbot</em> and started thinking of it as a <em>runtime</em>. The chat interface is just the REPL. The real power is in the tools it can invoke.</p><h2>Closing Thought</h2><p>Function calling isn't a feature — it's a paradigm shift. It moves AI from being a reference librarian to being an active participant in the build process. Claude doesn't just tell you how to fix a bug; it fixes it, tests it, and asks you to review the diff. It doesn't just explain a concept; it searches the web, synthesizes information, and writes a summary.</p><p>I still use traditional chat for brainstorming and rubber-ducking. But for actual <em>building</em>, I've wired Claude into my development loop. The result? I ship faster, debug less, and spend more time on architecture decisions that actually matter. If you haven't tried giving your AI the ability to execute, you're still doing it the hard way.</p><p>Now if you'll excuse me, Claude is refactoring my authentication middleware. I'm just here to approve the PR.</p>
+  </article>
+</main>
+<footer>
+  <p>&copy; 2026 Nerd Studio. <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/news/">News</a></p>
+</footer>
+</body>
+</html>

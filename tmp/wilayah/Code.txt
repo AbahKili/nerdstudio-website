@@ -1,0 +1,87 @@
+/**
+ * PROJECT 2: NERD STUDIO FORM PORTAL RENDERER
+ * Stateless. Zero DriveApp. Zero external API.
+ */
+
+function doGet(e) {
+  if (!e || !e.parameter || !e.parameter.f) {
+    return HtmlService.createHtmlOutput(
+      '<div style="padding:2rem;font-family:system-ui;text-align:center;max-width:480px;margin:4rem auto;">' +
+      '<div style="font-size:3rem;margin-bottom:1rem;">⚡</div>' +
+      '<h2>Nerd Studio Form Portal Renderer</h2>' +
+      '<p style="color:#64748b;">SaaS Engine Active — awaiting configuration token.</p>' +
+      '</div>'
+    );
+  }
+
+  try {
+    var decoded = Utilities.base64DecodeWebSafe(e.parameter.f);
+    var raw = Utilities.newBlob(decoded).getDataAsString();
+
+    // Sanitasi: hapus BOM, whitespace, dan karakter non-printable
+    raw = raw.replace(/^﻿/, '');
+    raw = raw.trim();
+
+    // Cek ada semicolon? Debugging
+    var semiIdx = raw.lastIndexOf(';');
+    if (semiIdx > -1) {
+      Logger.log('FOUND SEMICOLON at position ' + semiIdx + ', near: ' + raw.substring(Math.max(0, semiIdx - 20), semiIdx + 20));
+
+      // Coba hapus karakter setelah JSON valid terakhir
+      // JSON selalu diakhiri dengan } atau ]
+      var lastBrace = raw.lastIndexOf('}');
+      var lastBracket = raw.lastIndexOf(']');
+      var end = Math.max(lastBrace, lastBracket);
+      if (end > 0) {
+        raw = raw.substring(0, end + 1);
+        Logger.log('TRIMMED to ' + raw.length + ' chars');
+      }
+    }
+
+    var configObj = JSON.parse(raw);
+
+    if (!configObj.branding) configObj.branding = {};
+    if (!configObj.regions) configObj.regions = {};
+    if (!configObj.fields) configObj.fields = [];
+
+    var template = HtmlService.createTemplateFromFile('form_render');
+    template.config = configObj;
+    template.dataProv = PROVINSI;
+    template.dataKab = KABKOTA;
+    template.dataKec = KECAMATAN;
+
+    return template.evaluate()
+      .setTitle(configObj.branding.title || 'Form')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+
+  } catch (err) {
+    var msg = '<div style="padding:2rem;font-family:system-ui;max-width:700px;margin:4rem auto;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;">';
+    msg += '<h2 style="color:#dc2626;">Configuration Error</h2>';
+    msg += '<p style="color:#7f1d1d;"><b>' + err.name + '</b>: ' + err.message + '</p>';
+
+    try {
+      var dbgRaw = Utilities.newBlob(Utilities.base64DecodeWebSafe(e.parameter.f)).getDataAsString();
+      var semiPos = dbgRaw.indexOf(';');
+      msg += '<p style="color:#991b1b;font-size:0.9rem;">Semicolon pos: ' + semiPos + ' | Total length: ' + dbgRaw.length + ' chars</p>';
+      msg += '<details style="margin-top:1rem;"><summary style="cursor:pointer;color:#991b1b;">Full decoded token</summary>';
+      msg += '<textarea readonly style="width:100%;height:400px;font-size:0.7rem;font-family:monospace;white-space:pre-wrap;word-break:break-all;">' + dbgRaw + '</textarea>';
+      msg += '</details>';
+    } catch(e2) {}
+
+    msg += '<p style="margin-top:1rem;"><a href="' + ScriptApp.getService().getUrl() + '?f=' + encodeURIComponent(e.parameter.f) + '" style="color:#3b82f6;">Re-test with encoded URL</a></p>';
+    msg += '</div>';
+    return HtmlService.createHtmlOutput(msg);
+  }
+}
+
+function testRender() {
+  var testConfig = {
+    branding: { title: "Test Form", themeStyle: "dark", description: "Test" },
+    regions: { provinsi: true, kabkota: true, kecamatan: true },
+    formActionUrl: "https://docs.google.com/forms/d/e/test/formResponse",
+    fields: [{ label: "Nama", entry: "entry.123456789" }]
+  };
+  var encoded = Utilities.base64EncodeWebSafe(JSON.stringify(testConfig));
+  return "https://script.google.com/macros/s/" + ScriptApp.getScriptId() + "/exec?f=" + encoded;
+}

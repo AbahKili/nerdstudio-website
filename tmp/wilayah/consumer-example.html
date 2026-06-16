@@ -1,0 +1,113 @@
+<!--
+  CONSUMER EXAMPLE — Form dependent dropdown dengan library WILAYAH.
+  Copy ke project GAS sebagai file "Form.html".
+-->
+
+<h2>Form Alamat</h2>
+
+<label>Provinsi</label>
+<select id="provinsi" onchange="onProvChange()">
+  <option value="">-- Pilih Provinsi --</option>
+</select><br><br>
+
+<label>Kabupaten / Kota</label>
+<select id="kabkota" onchange="onKabChange()" disabled>
+  <option value="">-- Pilih Kab/Kota --</option>
+</select><br><br>
+
+<label>Kecamatan</label>
+<select id="kecamatan" onchange="onKecChange()" disabled>
+  <option value="">-- Pilih Kecamatan --</option>
+</select><br><br>
+
+<label>Desa / Kelurahan</label>
+<select id="desa" disabled>
+  <option value="">-- Pilih Desa/Kelurahan --</option>
+</select><br><br>
+
+<div id="result" style="margin-top:20px; padding:10px; background:#f0f0f0;"></div>
+
+<script>
+// Load provinsi on page load
+google.script.run.withSuccessHandler(function(list) {
+  var sel = document.getElementById('provinsi');
+  list.forEach(function(p) {
+    var opt = document.createElement('option');
+    opt.value = p.kode;
+    opt.text = p.nama;
+    sel.appendChild(opt);
+  });
+}).getProvinsi();
+
+function onProvChange() {
+  var kode = document.getElementById('provinsi').value;
+  var kab = document.getElementById('kabkota');
+  var kec = document.getElementById('kecamatan');
+  var desa = document.getElementById('desa');
+
+  // Reset downstream
+  kab.innerHTML = '<option value="">-- Pilih Kab/Kota --</option>';
+  kec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+  desa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+  kab.disabled = !kode;
+  kec.disabled = true;
+  desa.disabled = true;
+
+  if (!kode) return;
+
+  google.script.run.withSuccessHandler(function(list) {
+    list.forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = item.kode;
+      opt.text = item.nama;
+      kab.appendChild(opt);
+    });
+    kab.disabled = false;
+  }).getKabKota(kode);
+}
+
+function onKabChange() {
+  var kode = document.getElementById('kabkota').value;
+  var kec = document.getElementById('kecamatan');
+  var desa = document.getElementById('desa');
+
+  kec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+  desa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+  kec.disabled = !kode;
+  desa.disabled = true;
+
+  if (!kode) return;
+
+  google.script.run.withSuccessHandler(function(list) {
+    list.forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = item.kode;
+      opt.text = item.nama;
+      kec.appendChild(opt);
+    });
+    kec.disabled = false;
+  }).getKecamatan(kode);
+}
+
+function onKecChange() {
+  var kode = document.getElementById('kecamatan').value;
+  var desa = document.getElementById('desa');
+  var result = document.getElementById('result');
+
+  desa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+  desa.disabled = !kode;
+  result.innerHTML = '';
+
+  if (!kode) return;
+
+  google.script.run.withSuccessHandler(function(list) {
+    list.forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = item.kode;
+      opt.text = '[' + (item.tipe === 'Kelurahan' ? 'Kel' : item.tipe === 'Desa Adat' ? 'Adat' : 'Desa') + '] ' + item.nama;
+      desa.appendChild(opt);
+    });
+    desa.disabled = false;
+  }).getDesa(kode);
+}
+</script>
